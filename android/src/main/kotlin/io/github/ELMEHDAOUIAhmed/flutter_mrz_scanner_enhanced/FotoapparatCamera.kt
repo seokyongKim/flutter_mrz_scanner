@@ -1,4 +1,4 @@
-package io.github.olexale.flutter_mrz_scanner
+package: io.github.elmehdaouiahmed.flutter_mrz_scanner_enhanced
 
 import android.content.Context
 import android.graphics.*

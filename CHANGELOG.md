@@ -1,3 +1,13 @@
+## 3.0.3
+
+* missing package import fix
+
+## 3.0.2
+* Path error fix
+  - Fixed path issue when importing package
+
+(by @ELMEHDAOUIAhmed my apologies, trying to always on the lookout for issues)
+
 ## 3.0.1
 * Path error fix
   - Fixed path issue when importing package

@@ -22,19 +22,18 @@ class MRZScanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scanner =
-        defaultTargetPlatform == TargetPlatform.iOS
-            ? UiKitView(
-              viewType: 'mrzscanner',
-              onPlatformViewCreated: (int id) => onPlatformViewCreated(id),
-              creationParamsCodec: const StandardMessageCodec(),
-            )
-            : defaultTargetPlatform == TargetPlatform.android
+    final scanner = defaultTargetPlatform == TargetPlatform.iOS
+        ? UiKitView(
+            viewType: 'mrzscanner',
+            onPlatformViewCreated: (int id) => onPlatformViewCreated(id),
+            creationParamsCodec: const StandardMessageCodec(),
+          )
+        : defaultTargetPlatform == TargetPlatform.android
             ? AndroidView(
-              viewType: 'mrzscanner',
-              onPlatformViewCreated: (int id) => onPlatformViewCreated(id),
-              creationParamsCodec: const StandardMessageCodec(),
-            )
+                viewType: 'mrzscanner',
+                onPlatformViewCreated: (int id) => onPlatformViewCreated(id),
+                creationParamsCodec: const StandardMessageCodec(),
+              )
             : Text('$defaultTargetPlatform is not supported by this plugin');
     return withOverlay ? CameraOverlay(child: scanner) : scanner;
   }
@@ -54,7 +53,6 @@ class MRZController {
   late final MethodChannel _channel;
 
   void Function(MRZResult mrz)? onParsed;
-
   void Function(String text)? onError;
 
   void flashlightOn() {
@@ -66,9 +64,12 @@ class MRZController {
   }
 
   Future<List<int>?> takePhoto({bool crop = true}) async {
-    final result = await _channel.invokeMethod<List<int>>('takePhoto', {
-      'crop': crop,
-    });
+    final result = await _channel.invokeMethod<List<int>>(
+      'takePhoto',
+      {
+        'crop': crop,
+      },
+    );
     return result;
   }
 
@@ -82,7 +83,7 @@ class MRZController {
         break;
       case 'onParsed':
         if (onParsed != null) {
-          //Can be used for debugging
+          // Can be used for debugging
           // final String filePath = call.arguments as String;
           // debugPrint("MRZ BEFORE PARSE: $filePath");
           final lines = _splitRecognized(call.arguments);
