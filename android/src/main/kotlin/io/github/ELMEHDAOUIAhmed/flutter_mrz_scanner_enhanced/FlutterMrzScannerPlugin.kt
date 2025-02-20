@@ -1,4 +1,4 @@
-package: io.github.elmehdaouiahmed.flutter_mrz_scanner_enhanced
+package io.github.elmehdaouiahmed.flutter_mrz_scanner_enhanced
 
 import android.content.Context
 import android.view.View

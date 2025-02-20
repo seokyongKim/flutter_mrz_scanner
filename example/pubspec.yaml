@@ -1,5 +1,5 @@
-name: flutter_mrz_scanner_example
-description: Demonstrates how to use the flutter_mrz_scanner plugin.
+name: flutter_mrz_scanner_enhanced_example
+description: Demonstrates how to use the flutter_mrz_scanner_enhanced plugin.
 publish_to: 'none'
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   permission_handler: ^11.4.0
 
 dev_dependencies:
-  flutter_mrz_scanner:
+  flutter_mrz_scanner_enhanced:
     path: ../
   flutter_test:
     sdk: flutter

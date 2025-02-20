@@ -6,8 +6,8 @@ class CameraOverlay extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  static const _documentFrameRatio =
-      82.0 / 52.0; // was 1.42 Passport's size (ISO/IEC 7810 ID-3) is 125mm × 88mm
+  // Passport size (ISO/IEC 7810 ID-3) is 125mm × 88mm (ratio ~1.42)
+  static const _documentFrameRatio = 82.0 / 52.0;
   final Widget child;
 
   @override
@@ -35,7 +35,6 @@ class CameraOverlay extends StatelessWidget {
     );
   }
 
-  // Horizontal overlay calculation.
   RRect _calculateOverlaySize(Size size) {
     double width, height;
     if (size.height > size.width) {
