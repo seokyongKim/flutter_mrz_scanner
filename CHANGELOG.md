@@ -1,3 +1,7 @@
+## 3.0.4
+
+* missing package import fix
+
 ## 3.0.3
 
 * missing package import fix
