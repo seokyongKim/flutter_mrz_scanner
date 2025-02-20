@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
 class CameraOverlay extends StatelessWidget {
-  const CameraOverlay({
-    required this.child,
-    Key? key,
-  }) : super(key: key);
+  const CameraOverlay({required this.child, Key? key}) : super(key: key);
 
   static const _documentFrameRatio =
-      1.42; // Passport's size (ISO/IEC 7810 ID-3) is 125mm × 88mm
+      82.0 /
+      52.0; // was 1.42 Passport's size (ISO/IEC 7810 ID-3) is 125mm × 88mm
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (_, c) {
-        final overlayRect =
-            _calculateOverlaySize(Size(c.maxWidth, c.maxHeight));
+        final overlayRect = _calculateOverlaySize(
+          Size(c.maxWidth, c.maxHeight),
+        );
         return Stack(
           children: [
             child,
@@ -23,7 +22,7 @@ class CameraOverlay extends StatelessWidget {
               clipper: _DocumentClipper(rect: overlayRect),
               child: Container(
                 foregroundDecoration: const BoxDecoration(
-                  color: Color.fromRGBO(0, 0, 0, 0.45),
+                  color: Color.fromRGBO(0, 0, 0, 0.65),
                 ),
               ),
             ),
@@ -34,6 +33,7 @@ class CameraOverlay extends StatelessWidget {
     );
   }
 
+  //Horizontal
   RRect _calculateOverlaySize(Size size) {
     double width, height;
     if (size.height > size.width) {
@@ -46,34 +46,36 @@ class CameraOverlay extends StatelessWidget {
     final topOffset = (size.height - height) / 2;
     final leftOffset = (size.width - width) / 2;
 
-    final rect = RRect.fromLTRBR(leftOffset, topOffset, leftOffset + width,
-        topOffset + height, const Radius.circular(8));
+    final rect = RRect.fromLTRBR(
+      leftOffset,
+      topOffset,
+      leftOffset + width,
+      topOffset + height,
+      const Radius.circular(8),
+    );
     return rect;
   }
+
 }
 
 class _DocumentClipper extends CustomClipper<Path> {
-  _DocumentClipper({
-    required this.rect,
-  });
+  _DocumentClipper({required this.rect});
 
   final RRect rect;
 
   @override
-  Path getClip(Size size) => Path()
-    ..addRRect(rect)
-    ..addRect(Rect.fromLTWH(0.0, 0.0, size.width, size.height))
-    ..fillType = PathFillType.evenOdd;
+  Path getClip(Size size) =>
+      Path()
+        ..addRRect(rect)
+        ..addRect(Rect.fromLTWH(0.0, 0.0, size.width, size.height))
+        ..fillType = PathFillType.evenOdd;
 
   @override
   bool shouldReclip(_DocumentClipper oldClipper) => false;
 }
 
 class _WhiteOverlay extends StatelessWidget {
-  const _WhiteOverlay({
-    required this.rect,
-    Key? key,
-  }) : super(key: key);
+  const _WhiteOverlay({required this.rect, Key? key}) : super(key: key);
   final RRect rect;
 
   @override
@@ -92,3 +94,4 @@ class _WhiteOverlay extends StatelessWidget {
     );
   }
 }
+

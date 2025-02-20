@@ -22,18 +22,19 @@ class MRZScanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scanner = defaultTargetPlatform == TargetPlatform.iOS
-        ? UiKitView(
-            viewType: 'mrzscanner',
-            onPlatformViewCreated: (int id) => onPlatformViewCreated(id),
-            creationParamsCodec: const StandardMessageCodec(),
-          )
-        : defaultTargetPlatform == TargetPlatform.android
+    final scanner =
+        defaultTargetPlatform == TargetPlatform.iOS
+            ? UiKitView(
+              viewType: 'mrzscanner',
+              onPlatformViewCreated: (int id) => onPlatformViewCreated(id),
+              creationParamsCodec: const StandardMessageCodec(),
+            )
+            : defaultTargetPlatform == TargetPlatform.android
             ? AndroidView(
-                viewType: 'mrzscanner',
-                onPlatformViewCreated: (int id) => onPlatformViewCreated(id),
-                creationParamsCodec: const StandardMessageCodec(),
-              )
+              viewType: 'mrzscanner',
+              onPlatformViewCreated: (int id) => onPlatformViewCreated(id),
+              creationParamsCodec: const StandardMessageCodec(),
+            )
             : Text('$defaultTargetPlatform is not supported by this plugin');
     return withOverlay ? CameraOverlay(child: scanner) : scanner;
   }
@@ -64,9 +65,7 @@ class MRZController {
     _channel.invokeMethod<void>('flashlightOff');
   }
 
-  Future<List<int>?> takePhoto({
-    bool crop = true,
-  }) async {
+  Future<List<int>?> takePhoto({bool crop = true}) async {
     final result = await _channel.invokeMethod<List<int>>('takePhoto', {
       'crop': crop,
     });
@@ -77,9 +76,13 @@ class MRZController {
     switch (call.method) {
       case 'onError':
         onError?.call(call.arguments);
+        final String filePath = call.arguments as String;
+        debugPrint("MRZ ERROR: $filePath");
         break;
       case 'onParsed':
         if (onParsed != null) {
+          final String filePath = call.arguments as String;
+          debugPrint("MRZ BEFORE PARSE: $filePath");
           final lines = _splitRecognized(call.arguments);
           if (lines.isNotEmpty) {
             final result = MRZParser.tryParse(lines);
@@ -98,12 +101,8 @@ class MRZController {
     return mrzString.split('\n').where((s) => s.isNotEmpty).toList();
   }
 
-  void startPreview({bool isFrontCam = false}) => _channel.invokeMethod<void>(
-        'start',
-        {
-          'isFrontCam': isFrontCam,
-        },
-      );
+  void startPreview({bool isFrontCam = false}) =>
+      _channel.invokeMethod<void>('start', {'isFrontCam': isFrontCam});
 
   void stopPreview() => _channel.invokeMethod<void>('stop');
 }
