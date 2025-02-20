@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mrz_scanner/flutter_mrz_scanner.dart';
+import 'package:flutter_mrz_scanner/flutter_mrz_scanner_enhanced.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({Key? key}) : super(key: key);

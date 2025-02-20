@@ -1,3 +1,28 @@
+## 3.0.0
+
+* **OCR Optimization**: Implemented character whitelisting for MRZ-specific characters (`ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<`)
+* **Image Processing Enhancements**:
+  - Improved document cropping accuracy
+  - Added grayscale conversion pipeline
+  - Optimized binarization thresholds for better text recognition
+* **Camera Improvements**:
+  - Upgraded Fotoapparat implementation with better focus handling
+  - Enhanced frame processing reliability
+* **Overlay UI Updates**:
+  - Added dynamic scanning guidance indicators
+  - Improved aspect ratio handling for different devices
+* **Validation System**:
+  - Implemented MRZ checksum verification
+  - Added error correction heuristics
+* **Dependency Updates**:
+  - Upgraded Tesseract OCR to latest stable version
+  - Migrated to latest Kotlin Gradle plugin
+  - Updated Android target SDK to 34
+* **Breaking Change**: Requires minimum Flutter 3.16.0
+
+(by @ELMEHDAOUIAhmed)
+
+
 ## 2.1.1
 
 * Add namespace (by @makhosi6)
