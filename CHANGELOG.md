@@ -1,3 +1,9 @@
+## 3.0.1
+* Path error fix
+  - Fixed path issue when importing package
+
+(by @ELMEHDAOUIAhmed)
+
 ## 3.0.0
 
 * **OCR Optimization**: Implemented character whitelisting for MRZ-specific characters (`ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<`)

@@ -16,7 +16,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: io.github.ELMEHDAOUIAhmed.flutter_mrz_scanner.enhanced
+        package: io.github.ELMEHDAOUIAhmed.flutter_mrz_scanner_enhanced
         pluginClass: FlutterMrzScannerPlugin
       ios:
         pluginClass: FlutterMrzScannerPlugin
