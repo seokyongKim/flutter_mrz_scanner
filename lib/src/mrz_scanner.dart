@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_mrz_scanner/src/camera_overlay.dart';
+import 'package:flutter_mrz_scanner_enhanced/src/camera_overlay.dart';
 import 'package:mrz_parser/mrz_parser.dart';
 
 /// MRZ scanner camera widget
