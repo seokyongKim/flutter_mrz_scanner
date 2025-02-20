@@ -1,15 +1,31 @@
-# flutter_mrz_scanner
+# Flutter MRZ Scanner Enhanced 
 
-Scan MRZ (Machine Readable Zone) from identity documents (passport, id, visa) using iOS and Android. Heavily insipred by [QKMRZScanner](https://github.com/Mattijah/QKMRZScanner).
+[![Pub Version](https://img.shields.io/pub/v/flutter_mrz_scanner)](https://pub.dev/packages/flutter_mrz_scanner)
 
-## To plugin users
-Hello,
+**A community-maintained fork** of the original `flutter_mrz_scanner` package with significant improvements to MRZ scanning reliability and camera UX.
 
-Sorry that the plugin didn’t work well for all of you. Unfortunately, I don’t have testing devices and time for investigations and fixing issues at the moment. Please feel free to create new tickets. I would be even more grateful for pull requests.
-I’m not abandoning the plugin and promise to merge contributions with fixes and new functionality, hence I would kindly ask for help with the development 🙂
+## ✨ Key Enhancements
+- **Improved text recognition accuracy** through advanced image preprocessing
+- **Optimized camera overlay UI** for better user experience
+- Enhanced image processing pipelines
+- Modernized dependencies and null-safety support
+- Improved error handling and validation
+- Better platform compatibility
 
-Thanks in advance! 
+## 🙏 Acknowledgments
+This package builds upon the work of:
+- [@olexale](https://github.com/olexale) (Oleksandr Leushchenko) - Original creator
+- [@makhosi6](https://github.com/makhosi6) (Makhosandile) - Early contributor
+- [@eusopht2021](https://github.com/eusopht2021) - Community contributor
 
+## 🚧 Active Development
+As I'm actively using this in production, expect regular updates including:
+- Machine learning model optimizations
+- Real-time scanning improvements
+- Customizable UI components
+- Expanded document type support
+
+Contributions welcome! Please report issues and feature requests on [GitHub](https://github.com/ELMEHDAOUIAhmed/flutter_mrz_scanner).
 ### Supported formats:
 * TD1
 * TD2
@@ -30,7 +46,7 @@ Set iOS deployment target to 12.
 The plugin uses the device camera, so do not forget to provide the `NSCameraUsageDescription`. You may specify it in `Info.plist` like that:
 ```xml
     <key>NSCameraUsageDescription</key>
-    <string>May I scan a MRZ please?</string>
+    <string>SCANNING MRZ REQUIRE CAMERA PERMISSIONS</string>
 ```
 
 ### For Android
