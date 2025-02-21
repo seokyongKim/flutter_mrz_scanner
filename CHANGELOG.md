@@ -1,5 +1,9 @@
 ## 3.0.5
 
+* updated README file
+
+## 3.0.5
+
 * missing package import fix
 
 ## 3.0.4
