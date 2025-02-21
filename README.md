@@ -12,20 +12,31 @@ Based on [![Pub Version](https://img.shields.io/pub/v/flutter_mrz_scanner)](http
 - Improved error handling and validation
 - Better platform compatibility
 
+## 🚧 Active Development
+
+As I'm actively using this in production, expect regular updates including:
+
+### Performance Improvements 🚀
+- **Flutter Isolate Integration**: Offload heavy image processing and OCR tasks to background isolates for smoother UI performance.
+- **Real-Time MRZ Detection**: Implement live feedback for MRZ detection with visual indicators and dynamic UI updates.
+
+### Feature Enhancements ✨
+- **Machine Learning Model Optimizations**: Improve OCR accuracy with updated ML models and preprocessing pipelines.
+- **Customizable UI Components**: Allow developers to fully customize the camera overlay, scanning UI, and feedback animations.
+
+### Stability & Maintenance 🔧
+- **Improved Error Handling**: Better error reporting and recovery mechanisms for edge cases.
+- **Cross-Platform Compatibility**: Ensure consistent behavior across iOS, Android, and web platforms.
+- **Community-Driven Features**: Prioritize features and fixes based on community feedback.
+
+
 ## 🙏 Acknowledgments
 This package builds upon the work of:
 - [@olexale](https://github.com/olexale) (Oleksandr Leushchenko) - Original creator
 - [@makhosi6](https://github.com/makhosi6) (Makhosandile) - Early contributor
 - [@eusopht2021](https://github.com/eusopht2021) - Community contributor
 
-## 🚧 Active Development
-As I'm actively using this in production, expect regular updates including:
-- Machine learning model optimizations
-- Real-time scanning improvements
-- Customizable UI components
-- Expanded document type support
-
-Contributions welcome! Please report issues and feature requests on [GitHub](https://github.com/ELMEHDAOUIAhmed/flutter_mrz_scanner).
+Contributions welcome! Please report issues and feature requests on [GitHub](https://github.com/ELMEHDAOUIAhmed/flutter_mrz_scanner_enhanced).
 ### Supported formats:
 * TD1
 * TD2
