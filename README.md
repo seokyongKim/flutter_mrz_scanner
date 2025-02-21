@@ -60,7 +60,7 @@ to `AndroidManifest.xml`
 Use `MRZScanner` widget:
 ```dart
 MRZScanner(
-  withOverlay: true, // optional overlay
+  withOverlay: true, // Mandatory for proper document cropping
   onControllerCreated: (controller) =>
     onControllerCreated(controller),
   )
@@ -73,4 +73,4 @@ Refer to `example` project for the complete app sample.
 * [Mattijah](https://github.com/Mattijah) for beautiful [QKMRZScanner](https://github.com/Mattijah/QKMRZScanner) library
 
 ## License
-`flutter_mrz_scanner` is released under a [MIT License](https://opensource.org/licenses/MIT). See `LICENSE` for details.
+`flutter_mrz_scanner_enhanced` is released under a [MIT License](https://opensource.org/licenses/MIT). See `LICENSE` for details.
