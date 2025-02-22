@@ -1,3 +1,9 @@
+## 3.0.7
+
+improved performance, and adjusted document size, also added 10% margin to expand the crop region (10% extra on each side) (margin of error)
+
+## 3.0.6
+
 ## 3.0.5
 
 * updated README file
