@@ -43,7 +43,7 @@ class FotoapparatCamera constructor(
         pictureResolution = highestResolution(),
         previewResolution = highestResolution(),
         previewFpsRange = highestFps(),
-        jpegQuality = manualJpegQuality(100)
+        jpegQuality = manualJpegQuality(90)
     )
 
     val fotoapparat = Fotoapparat(
@@ -207,12 +207,12 @@ class FotoapparatCamera constructor(
 
 /**
  * Calculates a crop region based on the same document size used in your Flutter overlay.
- * It uses the aspect ratio 82:52 (≈1.577) and the same width/height percentages,
+ * It uses the aspect ratio 86:55 and the same width/height percentages,
  * then expands the region by a given margin to allow for misalignment.
  */
 private fun calculateCutoutRect(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
     // Use the same document ratio as in your Flutter overlay.
-    val documentFrameRatio = 82.0 / 52.0  // ≈1.577
+    val documentFrameRatio = 86.0 / 55.0  
 
     val width: Double
     val height: Double
@@ -230,8 +230,8 @@ private fun calculateCutoutRect(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
     val leftOffset = (bitmap.width - width) / 2.0
     val topOffset = (bitmap.height - height) / 2.0
 
-    // Define a margin percentage to expand the crop region (1% extra on each side)
-    val marginPercentage = 0.01
+    // Define a margin percentage to expand the crop region (10% extra on each side)
+    val marginPercentage = 0.1
     val marginX = width * marginPercentage
     val marginY = height * marginPercentage
 
