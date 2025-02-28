@@ -74,7 +74,7 @@ class FotoapparatCamera constructor(
                 val rotated = rotateBitmap(bitmap, rotationAngle(bitmapPhoto.rotationDegrees))
                 if (crop) {
                     // Crop the PHOTO 
-                    val cropped = calculateCutoutRect(rotated, true)
+                    val cropped = calculateCutoutRect(rotated, true) // use false if you don't want to crop to MRZ area
                     try {
                         val storageDir: File? =
                             context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)

@@ -1,3 +1,24 @@
+## 3.0.8
+
+# MRZ Cropping Enhancement  
+**Unified Function:** Introduced a single function, `calculateCutoutRect(Bitmap bitmap, Boolean cropToMRZ)`, which now supports two cropping modes:
+
+- **Document Crop:** When `cropToMRZ` is `false`, the image is cropped to the full document area with a 10% margin expansion (adjustable if needed; change `val marginPercentage = 0.1`, where `0.1` is 10%).  
+- **MRZ Crop:** When `cropToMRZ` is `true`, the image is cropped to only the MRZ area (35% of the document frame's height), accurately matching the measurements from the Flutter overlay.
+
+# Improved Accuracy  
+**Consistent Document Ratio:** The cropping calculations now use the same document frame ratio (86/55) and center the document area within the bitmap, ensuring consistent results across both native Android and Flutter overlays.
+
+
+- val cropped = calculateCutoutRect(rotated, true) // use false if you don't want to crop to MRZ area
+
+# Bug Fixes
+Correct Cropping Values: Fixed issues where incorrect cropping values might have been applied, ensuring the correct area is captured for MRZ scanning.
+
+Enjoy the enhanced MRZ scanning functionality!
+
+(by @ELMEHDAOUIAhmed)
+
 ## 3.0.7
 
 improved performance, and adjusted document size, also added 10% margin to expand the crop region (10% extra on each side) (margin of error)
