@@ -1,3 +1,9 @@
+## 3.0.9
+
+-Enhanced iOS implementation to align with the Android improvements.
+-Further testing is needed—unfortunately, I can't test it on iOS. If anyone with an iOS device could help and get in touch, I'd really appreciate it. You can find my contact details on my GitHub page.
+
+(by @ELMEHDAOUIAhmed)
 ## 3.0.8
 
 # MRZ Cropping Enhancement  
