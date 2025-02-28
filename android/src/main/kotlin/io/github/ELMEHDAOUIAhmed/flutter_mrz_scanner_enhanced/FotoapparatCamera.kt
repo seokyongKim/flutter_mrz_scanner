@@ -212,43 +212,57 @@ class FotoapparatCamera constructor(
  */
 private fun calculateCutoutRect(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
     // Use the same document ratio as in your Flutter overlay.
-    val documentFrameRatio = 86.0 / 55.0  
+    val documentFrameRatio = 86.0 / 55.0
 
     val width: Double
     val height: Double
 
-    // Use the same percentages as your overlay:
+    // Calculate document frame dimensions based on bitmap size.
     if (bitmap.height > bitmap.width) {
-        width = bitmap.width * 0.9   // 90% of available width
+        width = bitmap.width * 0.9  // 90% of available width
         height = width / documentFrameRatio
     } else {
         height = bitmap.height * 0.75  // 75% of available height
         width = height * documentFrameRatio
     }
 
-    // Center the "document" region within the image.
+    // Center the document region within the image.
     val leftOffset = (bitmap.width - width) / 2.0
     val topOffset = (bitmap.height - height) / 2.0
 
-    // Define a margin percentage to expand the crop region (10% extra on each side)
-    val marginPercentage = 0.1
-    val marginX = width * marginPercentage
-    val marginY = height * marginPercentage
+    return if (!cropToMRZ) {
+        // Normal cropping: Expand the region with a margin (10% extra on each side)
+        val marginPercentage = 0.1
+        val marginX = width * marginPercentage
+        val marginY = height * marginPercentage
 
-    // Compute the new coordinates, ensuring they are within bitmap bounds.
-    val newLeft = (leftOffset - marginX).coerceAtLeast(0.0)
-    val newTop = (topOffset - marginY).coerceAtLeast(0.0)
-    var newWidth = width * (1 + 2 * marginPercentage)
-    var newHeight = height * (1 + 2 * marginPercentage)
+        val newLeft = (leftOffset - marginX).coerceAtLeast(0.0)
+        val newTop = (topOffset - marginY).coerceAtLeast(0.0)
+        var newWidth = width * (1 + 2 * marginPercentage)
+        var newHeight = height * (1 + 2 * marginPercentage)
 
-    if (newLeft + newWidth > bitmap.width) {
-        newWidth = bitmap.width - newLeft
+        if (newLeft + newWidth > bitmap.width) {
+            newWidth = bitmap.width - newLeft
+        }
+        if (newTop + newHeight > bitmap.height) {
+            newHeight = bitmap.height - newTop
+        }
+
+        Bitmap.createBitmap(bitmap, newLeft.toInt(), newTop.toInt(), newWidth.toInt(), newHeight.toInt())
+    } else {
+        // Crop to MRZ area only: 35% of the document frame height at the bottom.
+        val mrzHeight = height * 0.35
+        val mrzLeft = leftOffset
+        val mrzTop = topOffset + height - mrzHeight
+        val mrzWidth = width
+
+        val cropLeft = mrzLeft.coerceAtLeast(0.0)
+        val cropTop = mrzTop.coerceAtLeast(0.0)
+        val cropWidth = if (cropLeft + mrzWidth > bitmap.width) bitmap.width - cropLeft else mrzWidth
+        val cropHeight = if (cropTop + mrzHeight > bitmap.height) bitmap.height - cropTop else mrzHeight
+
+        Bitmap.createBitmap(bitmap, cropLeft.toInt(), cropTop.toInt(), cropWidth.toInt(), cropHeight.toInt())
     }
-    if (newTop + newHeight > bitmap.height) {
-        newHeight = bitmap.height - newTop
-    }
-
-    return Bitmap.createBitmap(bitmap, newLeft.toInt(), newTop.toInt(), newWidth.toInt(), newHeight.toInt())
 }
 
 }
