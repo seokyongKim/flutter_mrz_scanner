@@ -35,6 +35,7 @@ class CameraOverlay extends StatelessWidget {
     );
   }
 
+
   RRect _calculateOverlaySize(Size size) {
     double width, height;
     if (size.height > size.width) {

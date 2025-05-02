@@ -78,14 +78,14 @@ class MRZController {
       case 'onError':
         onError?.call(call.arguments);
         // Can be used for debugging
-        // final String filePath = call.arguments as String;
-        // debugPrint("MRZ ERROR: $filePath");
+        final String filePath = call.arguments as String;
+        debugPrint('MRZ ERROR: $filePath');
         break;
       case 'onParsed':
         if (onParsed != null) {
           // Can be used for debugging
-          // final String filePath = call.arguments as String;
-          // debugPrint("MRZ BEFORE PARSE: $filePath");
+          final String filePath = call.arguments as String;
+          debugPrint('MRZ BEFORE PARSE: $filePath');
           final lines = _splitRecognized(call.arguments);
           if (lines.isNotEmpty) {
             final result = MRZParser.tryParse(lines);

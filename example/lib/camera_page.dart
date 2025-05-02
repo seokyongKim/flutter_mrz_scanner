@@ -14,12 +14,22 @@ class _CameraPageState extends State<CameraPage> {
 
   // Document overlay ratio (for driving license: 82/52).
   static const double _documentFrameRatio = 82.0 / 52.0;
+    bool isFlashOn = false;
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scan MRZ'),
+        title: const Text('Scan Back Side'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isFlashOn ? Icons.flash_off_rounded : Icons.flash_on_rounded,
+            ),
+            onPressed: _toggleFlash,
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -64,6 +74,17 @@ class _CameraPageState extends State<CameraPage> {
         },
       ),
     );
+  }
+
+    void _toggleFlash() {
+    if (isFlashOn) {
+      controller?.flashlightOff();
+    } else {
+      controller?.flashlightOn();
+    }
+    setState(() {
+      isFlashOn = !isFlashOn;
+    });
   }
 
   /// Calculates the overlay area based on screen size and document ratio.
