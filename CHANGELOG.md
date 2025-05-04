@@ -3,6 +3,7 @@
 - Temporarily disabled the Document Crop feature due to issues with document size inconsistencies.
 - Added a feedback mechanism run /example `camera_page.dart` to view it,used for real-time interaction, providing users with updates instead of displaying a static loading screen.
 - Implemented MRZ character replacement to address known OCR detection issues.
+- Upgraded Java version to 17 to ensure compatibility with Flutter.
 
 (by @ELMEHDAOUIAhmed)
 
