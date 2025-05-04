@@ -80,3 +80,8 @@ lcov.info
 
 # Ignore Gradle build output directory
 build
+
+
+# Allow specific Kotlin files for the package
+!android/src/main/kotlin/io/github/ELMEHDAOUIAhmed/flutter_mrz_scanner_enhanced/FlutterMrzScannerPlugin.kt
+!android/src/main/kotlin/io/github/ELMEHDAOUIAhmed/flutter_mrz_scanner_enhanced/FotoapparatCamera.kt
