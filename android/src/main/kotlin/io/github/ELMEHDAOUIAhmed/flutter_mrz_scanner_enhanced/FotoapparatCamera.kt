@@ -22,6 +22,7 @@ import io.fotoapparat.parameter.*
 import io.fotoapparat.selector.manualJpegQuality
 import android.os.Environment
 import android.util.Log
+import android.util.Base64
 
 class FotoapparatCamera constructor(
     val context: Context,
@@ -74,7 +75,7 @@ class FotoapparatCamera constructor(
                 val rotated = rotateBitmap(bitmap, rotationAngle(bitmapPhoto.rotationDegrees))
                 if (crop) {
                     // Crop the PHOTO 
-                    val cropped = calculateCutoutRect(rotated, true) // use false if you don't want to crop to MRZ area
+                    val cropped = calculateCutoutRect(rotated, false) // use false if you don't want to crop to MRZ area
                     try {
                         val storageDir: File? =
                             context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -83,16 +84,7 @@ class FotoapparatCamera constructor(
                         file.outputStream().use { output ->
                             cropped.compress(Bitmap.CompressFormat.JPEG, 100, output)
                         }
-                        // Log and send the file path via the method channel.
-                        Log.i("FotoapparatCamera", "Cropped image saved at: ${file.absolutePath}")
-                        // Instead of waiting for result.success here, immediately notify Flutter.
-                        mainExecutor.execute {
-                            messenger.invokeMethod("onCroppedImagePath", file)
-                        }
-                        // And then immediately return success (or a placeholder) so that the original method call doesn't block.
-                        mainExecutor.execute {
-                            result.success("CROPPED_IMAGE_SAVED")
-                        }
+
                     } catch (e: IOException) {
                         e.printStackTrace()
                         mainExecutor.execute {
@@ -198,7 +190,7 @@ class FotoapparatCamera constructor(
         directory.mkdir()
         return File(directory, fileName).also { file ->
             file.outputStream().use { cache ->
-                context.assets.open(fileName).use { stream ->
+                context.assets.open(fileName).use { stream -> 
                     stream.copyTo(cache)
                 }
             }

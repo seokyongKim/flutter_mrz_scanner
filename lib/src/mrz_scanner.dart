@@ -52,8 +52,10 @@ class MRZController {
 
   late final MethodChannel _channel;
 
+  void Function()? onDetection;
   void Function(MRZResult mrz)? onParsed;
   void Function(String text)? onError;
+  void Function()? onParsingFailed;
 
   void flashlightOn() {
     _channel.invokeMethod<void>('flashlightOn');
@@ -77,13 +79,12 @@ class MRZController {
     switch (call.method) {
       case 'onError':
         onError?.call(call.arguments);
-        // Can be used for debugging
-        final String filePath = call.arguments as String;
-        debugPrint('MRZ ERROR: $filePath');
+        debugPrint('Error occurred: ${call.arguments}');
         break;
       case 'onParsed':
         if (onParsed != null) {
-          // Can be used for debugging
+          debugPrint('MRZ detected, parsing please wait...');
+          onDetection?.call(); // Notify that MRZ is detected
           final String filePath = call.arguments as String;
           debugPrint('MRZ BEFORE PARSE: $filePath');
           final lines = _splitRecognized(call.arguments);
@@ -91,16 +92,25 @@ class MRZController {
             final result = MRZParser.tryParse(lines);
             if (result != null) {
               onParsed!(result);
+              debugPrint('Parsing successful');
+            } else {
+              debugPrint('Parsing failed, Scanning again');
+              onParsingFailed?.call(); // Notify parsing failure
             }
+          } else {
+            debugPrint('No MRZ lines detected');
+            onParsingFailed?.call(); // Notify parsing failure
           }
         }
         break;
     }
     return Future.value();
   }
-
   List<String> _splitRecognized(String recognizedText) {
-    final mrzString = recognizedText.replaceAll(' ', '');
+    final mrzString = recognizedText
+        .replaceAll(' ', '')
+        .replaceAll('«', '<')
+        .replaceAll('DZAK', 'DZA<');
     return mrzString.split('\n').where((s) => s.isNotEmpty).toList();
   }
 

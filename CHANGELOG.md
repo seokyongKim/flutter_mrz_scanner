@@ -1,3 +1,11 @@
+## 3.1.0
+
+- Temporarily disabled the Document Crop feature due to issues with document size inconsistencies.
+- Added a feedback mechanism run /example `camera_page.dart` to view it,used for real-time interaction, providing users with updates instead of displaying a static loading screen.
+- Implemented MRZ character replacement to address known OCR detection issues.
+
+(by @ELMEHDAOUIAhmed)
+
 ## 3.0.9
 
 -Enhanced iOS implementation to align with the Android improvements.

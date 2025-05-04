@@ -148,7 +148,7 @@ fileprivate func cutoutRect(for cgImage: CGImage) -> CGRect {
     let imageHeight = CGFloat(cgImage.height)
     // Call the updated calculateCutoutRect function with cropToMRZ set to true.
     // Here, we're using the view's bounds as the reference size.
-    let rect = videoPreviewLayer.metadataOutputRectConverted(fromLayerRect: calculateCutoutRect(for: bounds.size, cropToMRZ: true))
+    let rect = videoPreviewLayer.metadataOutputRectConverted(fromLayerRect: calculateCutoutRect(for: bounds.size, cropToMRZ: false))
     let videoOrientation = videoPreviewLayer.connection!.videoOrientation
 
     if videoOrientation == .portrait || videoOrientation == .portraitUpsideDown {

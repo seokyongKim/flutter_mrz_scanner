@@ -11,11 +11,12 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
   bool isParsed = false;
   MRZController? controller;
+  final ValueNotifier<String> statusNotifier = ValueNotifier('');
+  final List<String> _statusMessages = [];
 
   // Document overlay ratio (for driving license: 82/52).
   static const double _documentFrameRatio = 82.0 / 52.0;
-    bool isFlashOn = false;
-
+  bool isFlashOn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -62,11 +63,32 @@ class _CameraPageState extends State<CameraPage> {
                 left: overlayRect.left,
                 top: overlayRect.bottom + 8,
                 width: overlayRect.width,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
+                child: ValueListenableBuilder<String>(
+                  valueListenable: statusNotifier,
+                  builder: (context, _, child) {
+                    return Column(
+                      children: List.generate(_statusMessages.length, (index) {
+                        final message =
+                            _statusMessages[_statusMessages.length - 1 - index];
+                        return AnimatedOpacity(
+                          opacity: index == 0 ? 1.0 : 0.5,
+                          duration: const Duration(milliseconds: 300),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: 4.0), // Add spacing between messages
+                            child: Text(
+                              message,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    );
+                  },
                 ),
               ),
             ],
@@ -76,7 +98,18 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
-    void _toggleFlash() {
+  void _updateStatus(String message) {
+    _statusMessages.add(message); // Add the new message to the list
+    statusNotifier.value = message; // Trigger a rebuild
+
+    // Remove the message after a delay
+    Future.delayed(const Duration(seconds: 1), () {
+      _statusMessages.remove(message);
+      statusNotifier.value = ''; // Trigger a rebuild
+    });
+  }
+
+  void _toggleFlash() {
     if (isFlashOn) {
       controller?.flashlightOff();
     } else {
@@ -116,45 +149,75 @@ class _CameraPageState extends State<CameraPage> {
 
   void onControllerCreated(MRZController controller) {
     this.controller = controller;
-    controller.onParsed = (result) async {
-      if (isParsed) return;
-      isParsed = true;
+    _updateStatus('Camera initialized');
 
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text('Document type: ${result.documentType}'),
-                Text('Country: ${result.countryCode}'),
-                Text('Surnames: ${result.surnames}'),
-                Text('Given names: ${result.givenNames}'),
-                Text('Document number: ${result.documentNumber}'),
-                Text('Nationality code: ${result.nationalityCountryCode}'),
-                Text('Birthdate: ${result.birthDate}'),
-                Text('Sex: ${result.sex}'),
-                Text('Expiry date: ${result.expiryDate}'),
-                Text('Personal number: ${result.personalNumber}'),
-                Text('Personal number 2: ${result.personalNumber2}'),
-              ],
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              child: const Text('OK'),
-              onPressed: () {
-                isParsed = false;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
+    controller.onDetection = () {
+      _updateStatus('MRZ Detected, Parsing...');
     };
 
-    controller.onError = (error) => print(error);
+    controller.onParsed = (result) async {
+      if (isParsed) {
+        return;
+      }
+
+      try {
+        isParsed = true;
+
+        await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text('Document type: ${result.documentType}'),
+                  Text('Country: ${result.countryCode}'),
+                  Text('Surnames: ${result.surnames}'),
+                  Text('Given names: ${result.givenNames}'),
+                  Text('Document number: ${result.documentNumber}'),
+                  Text('Nationality code: ${result.nationalityCountryCode}'),
+                  Text('Birthdate: ${result.birthDate}'),
+                  Text('Sex: ${result.sex}'),
+                  Text('Expiry date: ${result.expiryDate}'),
+                  Text('Personal number: ${result.personalNumber}'),
+                  Text('Personal number 2: ${result.personalNumber2}'),
+                ],
+              ),
+            ),
+            actions: [
+              ElevatedButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  isParsed = false;
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+
+        // Reset status after parsing is complete
+        _updateStatus('');
+      } catch (e, stackTrace) {
+        // Log the error and reset the state
+        debugPrint('Error during parsing: $e');
+        debugPrint(stackTrace.toString());
+        _updateStatus('Parsing failed, scanning again');
+        isParsed = false;
+      }
+    };
+
+    controller.onParsingFailed = () {
+      // Update status when parsing fails
+      _updateStatus('Parsing failed, scanning again');
+      debugPrint('Parsing failed callback triggered');
+    };
+
+    controller.onError = (error) {
+      _updateStatus('Parsing failed, scanning again');
+      debugPrint('Error: $error');
+    };
+
     controller.startPreview();
   }
 }
