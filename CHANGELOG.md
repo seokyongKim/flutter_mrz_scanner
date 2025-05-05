@@ -1,3 +1,19 @@
+## 3.1.1
+
+- 🚀 Update: Added Coroutine Support for Async MRZ OCR
+
+- 🔄 Changes Made
+- Converted heavy MRZ processing to run off the UI thread using Kotlin coroutines.
+- Matches Dart's isolate behavior for performance and responsiveness.
+- Ensures camera and UI remain smooth during OCR
+
+- ⚙️ Benefits
+
+- Avoids UI freezes during OCR
+- Improves overall performance
+- Keeps native processing consistent with Dart isolate logic
+
+
 ## 3.1.0
 
 - Temporarily disabled the Document Crop feature due to issues with document size inconsistencies.

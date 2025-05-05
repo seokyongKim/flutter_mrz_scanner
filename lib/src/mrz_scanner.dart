@@ -106,6 +106,7 @@ class MRZController {
     }
     return Future.value();
   }
+
   List<String> _splitRecognized(String recognizedText) {
     final mrzString = recognizedText
         .replaceAll(' ', '')

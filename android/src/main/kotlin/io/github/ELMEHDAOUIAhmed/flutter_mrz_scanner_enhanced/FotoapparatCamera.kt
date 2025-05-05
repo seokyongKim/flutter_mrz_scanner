@@ -1,5 +1,6 @@
 package io.github.elmehdaouiahmed.flutter_mrz_scanner_enhanced
 
+import kotlinx.coroutines.*
 import android.content.Context
 import android.graphics.*
 import androidx.annotation.NonNull
@@ -31,6 +32,8 @@ class FotoapparatCamera constructor(
     private val DEFAULT_PAGE_SEG_MODE = TessBaseAPI.PageSegMode.PSM_SINGLE_BLOCK
     private var cachedTessData: File? = null
     private var mainExecutor = ContextCompat.getMainExecutor(context)
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + job)
 
     val cameraView = CameraView(context)
 
@@ -117,11 +120,15 @@ class FotoapparatCamera constructor(
         val bitmap = getImage(frame)
         // Preprocess the full image (convert to grayscale and apply thresholding) to improve OCR.
         val processedBitmap = preprocessImage(bitmap)
+
+        scope.launch {
         val mrzText = scanMRZ(processedBitmap)
         val fixedMrz = extractMRZ(mrzText)
-        mainExecutor.execute {
+
+        withContext(Dispatchers.Main) {
             messenger.invokeMethod("onParsed", fixedMrz)
         }
+    }
     }
 
     private fun getImage(frame: Frame): Bitmap {
@@ -257,5 +264,8 @@ private fun calculateCutoutRect(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
     }
 }
 
+    fun dispose() {
+    job.cancel()
+    }
 }
 
