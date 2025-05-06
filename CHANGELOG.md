@@ -1,3 +1,10 @@
+# 3.1.3
+
+- 🛠️ Fixed: Resolved an app crash issue in version 3.1.2. Apologies for not testing on a real device prior to release.
+
+## 3.1.2
+
+
 ## 3.1.1
 
 - 🚀 Update: Added Coroutine Support for Async MRZ OCR

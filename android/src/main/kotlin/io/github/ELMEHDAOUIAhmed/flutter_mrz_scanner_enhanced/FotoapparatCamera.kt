@@ -78,7 +78,8 @@ class FotoapparatCamera constructor(
                 val rotated = rotateBitmap(bitmap, rotationAngle(bitmapPhoto.rotationDegrees))
                 if (crop) {
                     // Crop the PHOTO 
-                    val cropped = calculateCutoutRect(rotated, false) // use false if you don't want to crop to MRZ area
+                    //val cropped = calculateCutoutRect(rotated, false) // use false if you don't want to crop to MRZ area
+                    val cropped = calculateCutoutRectCardSize(rotated, false)
                     try {
                         val storageDir: File? =
                             context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -118,8 +119,12 @@ class FotoapparatCamera constructor(
     // Process the full frame: apply pre‑processing and OCR without cropping.
     private fun processFrame(frame: Frame) {
         val bitmap = getImage(frame)
+        //val cropped = calculateCutoutRect(bitmap, true)
         // Preprocess the full image (convert to grayscale and apply thresholding) to improve OCR.
-        val processedBitmap = preprocessImage(bitmap)
+        val cropped = calculateCutoutRectCardSize(bitmap, true)
+        val processedBitmap = preprocessImage(cropped)
+       
+
 
         scope.launch {
         val mrzText = scanMRZ(processedBitmap)
@@ -209,7 +214,7 @@ class FotoapparatCamera constructor(
  * It uses the aspect ratio 86:55 and the same width/height percentages,
  * then expands the region by a given margin to allow for misalignment.
  */
-private fun calculateCutoutRect(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
+    private fun calculateCutoutRect(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
     // Use the same document ratio as in your Flutter overlay.
     val documentFrameRatio = 86.0 / 55.0
 
@@ -262,7 +267,41 @@ private fun calculateCutoutRect(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
 
         Bitmap.createBitmap(bitmap, cropLeft.toInt(), cropTop.toInt(), cropWidth.toInt(), cropHeight.toInt())
     }
-}
+    }
+
+    private fun calculateCutoutRectCardSize(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
+        val documentFrameRatio = 1.42 // Passport's size (ISO/IEC 7810 ID-3) is 125mm × 88mm
+        val width: Double
+        val height: Double
+    
+        if (bitmap.height > bitmap.width) {
+            width = bitmap.width * 0.9 // Fill 90% of the width
+            height = width / documentFrameRatio
+        } else {
+            height = bitmap.height * 0.75 // Fill 75% of the height
+            width = height * documentFrameRatio
+        }
+    
+        val mrzZoneOffset = if (cropToMRZ) height * 0.6 else 0.0
+        val topOffset = ((bitmap.height - height) / 2 + mrzZoneOffset).coerceAtLeast(0.0)
+        val leftOffset = ((bitmap.width - width) / 2).coerceAtLeast(0.0)
+    
+        val cropWidth = width.coerceAtMost(bitmap.width - leftOffset)
+        val cropHeight = (height - mrzZoneOffset).coerceAtMost(bitmap.height - topOffset)
+    
+        // Validate crop dimensions
+        if (cropWidth <= 0 || cropHeight <= 0) {
+            throw IllegalArgumentException("Invalid crop dimensions: width=$cropWidth, height=$cropHeight")
+        }
+    
+        return Bitmap.createBitmap(
+            bitmap,
+            leftOffset.toInt(),
+            topOffset.toInt(),
+            cropWidth.toInt(),
+            cropHeight.toInt()
+        )
+    }
 
     fun dispose() {
     job.cancel()
