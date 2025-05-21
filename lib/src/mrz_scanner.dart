@@ -53,7 +53,7 @@ class MRZController {
   late final MethodChannel _channel;
 
   void Function()? onDetection;
-  void Function(MRZResult mrz)? onParsed;
+  void Function(MRZFullResult mrz)? onParsed;
   void Function(String text)? onError;
   void Function()? onParsingFailed;
 
@@ -91,7 +91,7 @@ class MRZController {
           if (lines.isNotEmpty) {
             final result = MRZParser.tryParse(lines);
             if (result != null) {
-              onParsed!(result);
+              onParsed!(MRZFullResult(mrz: filePath, mrzResult: result));
               debugPrint('Parsing successful');
             } else {
               debugPrint('Parsing failed, Scanning again');
@@ -119,4 +119,10 @@ class MRZController {
       _channel.invokeMethod<void>('start', {'isFrontCam': isFrontCam});
 
   void stopPreview() => _channel.invokeMethod<void>('stop');
+}
+
+class MRZFullResult {
+  MRZFullResult({required this.mrz, required this.mrzResult});
+  final String mrz;
+  final MRZResult mrzResult;
 }
