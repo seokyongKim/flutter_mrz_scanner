@@ -155,13 +155,13 @@ class _CameraPageState extends State<CameraPage> {
       _updateStatus('MRZ Detected, Parsing...');
     };
 
-    controller.onParsed = (result) async {
+    controller.onParsed = (parsedResult) async {
       if (isParsed) {
         return;
       }
-
       try {
         isParsed = true;
+        final result = parsedResult.mrzResult;
 
         await showDialog<void>(
           context: context,
@@ -170,6 +170,7 @@ class _CameraPageState extends State<CameraPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  Text('MRZ: ${parsedResult.mrz}'),
                   Text('Document type: ${result.documentType}'),
                   Text('Country: ${result.countryCode}'),
                   Text('Surnames: ${result.surnames}'),

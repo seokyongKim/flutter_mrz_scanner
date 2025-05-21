@@ -81,12 +81,18 @@ class FotoapparatCamera constructor(
                     //val cropped = calculateCutoutRect(rotated, false) // use false if you don't want to crop to MRZ area
                     val cropped = calculateCutoutRectCardSize(rotated, false)
                     try {
-                        val storageDir: File? =
-                            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                        val storageDir = context.cacheDir
                         val fileName = "cropped_image_${System.currentTimeMillis()}.jpg"
                         val file = File(storageDir, fileName)
                         file.outputStream().use { output ->
                             cropped.compress(Bitmap.CompressFormat.JPEG, 100, output)
+                        }
+                        
+                        val stream = ByteArrayOutputStream()
+                        cropped.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                        val array = stream.toByteArray()
+                        mainExecutor.execute {
+                            result.success(array)
                         }
 
                     } catch (e: IOException) {
