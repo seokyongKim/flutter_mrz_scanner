@@ -160,6 +160,10 @@ class _CameraPageState extends State<CameraPage> {
         return;
       }
       try {
+        // test takePhoto
+        // final photo = await controller.takePhoto();
+        // print('photo: $photo');
+
         isParsed = true;
         final result = parsedResult.mrzResult;
 
@@ -199,6 +203,7 @@ class _CameraPageState extends State<CameraPage> {
 
         // Reset status after parsing is complete
         _updateStatus('');
+        return;
       } catch (e, stackTrace) {
         // Log the error and reset the state
         debugPrint('Error during parsing: $e');
