@@ -99,7 +99,7 @@ public class MRZScannerView: UIView {
         captureSession.stopRunning()
     }
     
-    // EDIT: Updated takePhoto to more closely match Android’s behavior.
+    // EDIT: Updated takePhoto to more closely match Android's behavior.
     // Instead of saving to a file, we send the image data (cropped or full) via the delegate.
     public func takePhoto(shouldCrop: Bool) {
         self.shouldCrop = shouldCrop
@@ -335,7 +335,7 @@ extension MRZScannerView: AVCaptureVideoDataOutputSampleBufferDelegate {
             let mrzTextRectangles = results.map({ $0.boundingBox.applying(transform) }).filter({ $0.width > (imageWidth * 0.8) })
             let mrzRegionRect = mrzTextRectangles.reduce(into: CGRect.null, { $0 = $0.union($1) })
             
-            // EDIT: Only process if the region is not too tall (similar to Android’s check).
+            // EDIT: Only process if the region is not too tall (similar to Android's check).
             guard mrzRegionRect.height <= (imageHeight * 0.4) else {
                 return
             }
@@ -358,7 +358,7 @@ extension MRZScannerView: AVCapturePhotoCaptureDelegate {
             print("Error capturing photo: \(error)")
         } else {
             photoData = photo.fileDataRepresentation()
-            // EDIT: Use the device’s orientation instead of a fixed one.
+            // EDIT: Use the device's orientation instead of a fixed one.
             let currentOrientation = self.interfaceOrientation
             let uiOrientation: UIImage.Orientation = {
                 switch currentOrientation {
@@ -377,11 +377,35 @@ extension MRZScannerView: AVCapturePhotoCaptureDelegate {
             if self.shouldCrop {
                 // Crop the image to the document area.
                 let document = self.documentImage(from: resized ?? rotated!)
+                
+                // Save to temporary storage
+                if let pngData = document.png {
+                    saveImageToTemporaryStorage(imageData: pngData)
+                }
+                
                 delegate?.onPhoto(document.png)
             } else {
                 let img = resized ?? rotated!
+                
+                // Save to temporary storage
+                if let pngData = img.png {
+                    saveImageToTemporaryStorage(imageData: pngData)
+                }
+                
                 delegate?.onPhoto(img.png)
             }
+        }
+    }
+    
+    private func saveImageToTemporaryStorage(imageData: Data) {
+        do {
+            let tempDir = FileManager.default.temporaryDirectory
+            let fileName = "mrz_image_\(Int(Date().timeIntervalSince1970)).png"
+            let fileURL = tempDir.appendingPathComponent(fileName)
+            try imageData.write(to: fileURL)
+            print("Image saved to temporary storage: \(fileURL.path)")
+        } catch {
+            print("Error saving image to temporary storage: \(error)")
         }
     }
     
