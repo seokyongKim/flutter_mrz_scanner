@@ -24,7 +24,7 @@ import io.fotoapparat.selector.manualJpegQuality
 import android.os.Environment
 import android.util.Log
 import android.util.Base64
-
+import org.opencv.android.OpenCVLoader
 class FotoapparatCamera constructor(
     val context: Context,
     var messenger: MethodChannel
@@ -59,6 +59,11 @@ class FotoapparatCamera constructor(
     init {
         if (cachedTessData == null) {
             cachedTessData = getFileFromAssets(context, fileName = "ocrb.traineddata")
+        }
+        if (!OpenCVLoader.initDebug()) {
+            Log.e("OpenCV", "OpenCV initialization failed")
+        } else {
+            Log.d("OpenCV", "OpenCV initialized successfully")
         }
     }
 
@@ -125,21 +130,48 @@ class FotoapparatCamera constructor(
     // Process the full frame: apply pre‑processing and OCR without cropping.
     private fun processFrame(frame: Frame) {
         val bitmap = getImage(frame)
-        //val cropped = calculateCutoutRect(bitmap, true)
-        // Preprocess the full image (convert to grayscale and apply thresholding) to improve OCR.
+    
+        // MRZ 영역 추출
         val cropped = calculateCutoutRectCardSize(bitmap, true)
-        val processedBitmap = preprocessImage(cropped)
-       
-
-
+    
+        // ✅ 고해상도 스케일 업 (Tesseract 선호)
+        val scaled = Bitmap.createScaledBitmap(cropped, cropped.width * 2, cropped.height * 2, true)
+    
+        // ✅ 고급 전처리 (흑백 + adaptive threshold 흉내)
+        val processed = preprocessImageAdvanced(scaled)
+    
         scope.launch {
-        val mrzText = scanMRZ(processedBitmap)
-        val fixedMrz = extractMRZ(mrzText)
-
-        withContext(Dispatchers.Main) {
-            messenger.invokeMethod("onParsed", fixedMrz)
+            val mrzText = scanMRZ(processed)
+            val fixedMrz = extractMRZ(mrzText)
+    
+            withContext(Dispatchers.Main) {
+                messenger.invokeMethod("onParsed", fixedMrz)
+            }
         }
     }
+
+    private fun preprocessImageAdvanced(bitmap: Bitmap): Bitmap {
+        val grayscale = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(grayscale)
+        val paint = Paint()
+        val colorMatrix = ColorMatrix().apply { setSaturation(0f) }
+        paint.colorFilter = ColorMatrixColorFilter(colorMatrix)
+        canvas.drawBitmap(bitmap, 0f, 0f, paint)
+    
+        // Otsu threshold 흉내
+        val width = grayscale.width
+        val height = grayscale.height
+        val pixels = IntArray(width * height)
+        grayscale.getPixels(pixels, 0, width, 0, 0, width, height)
+    
+        for (i in pixels.indices) {
+            val gray = Color.red(pixels[i])
+            pixels[i] = if (gray < 128) Color.BLACK else Color.WHITE
+        }
+    
+        val thresholded = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        thresholded.setPixels(pixels, 0, width, 0, 0, width, height)
+        return thresholded
     }
 
     private fun getImage(frame: Frame): Bitmap {
@@ -185,20 +217,29 @@ class FotoapparatCamera constructor(
     // Run OCR using Tesseract on the provided bitmap.
     private fun scanMRZ(bitmap: Bitmap): String {
         val baseApi = TessBaseAPI()
+    
         baseApi.init(context.cacheDir.absolutePath, "ocrb")
-        // Set Tesseract to recognize only MRZ-valid characters.
+    
+        // ✅ 세팅 강화
         baseApi.setVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<")
-        baseApi.pageSegMode = DEFAULT_PAGE_SEG_MODE
+        baseApi.setVariable("user_defined_dpi", "300")
+        baseApi.setVariable("load_system_dawg", "F")
+        baseApi.setVariable("load_freq_dawg", "F")
+        baseApi.pageSegMode = TessBaseAPI.PageSegMode.PSM_AUTO_OSD
+    
         baseApi.setImage(bitmap)
         val mrz = baseApi.utF8Text
         baseApi.stop()
+    
         return mrz
     }
 
     private fun extractMRZ(input: String): String {
         val lines = input.split("\n")
-        val mrzLength = lines.last().length
-        val mrzLines = lines.takeLastWhile { it.length == mrzLength }
+        val mrzLines = lines.filter { it.trim().length in 40..45 && it.contains(Regex("[0-9A-Z<]{10,}")) }
+        if (mrzLines.size >= 2) {
+            return mrzLines.takeLast(2).joinToString("\n")
+        }
         return mrzLines.joinToString("\n")
     }
 
@@ -261,7 +302,7 @@ class FotoapparatCamera constructor(
         Bitmap.createBitmap(bitmap, newLeft.toInt(), newTop.toInt(), newWidth.toInt(), newHeight.toInt())
     } else {
         // Crop to MRZ area only: 35% of the document frame height at the bottom.
-        val mrzHeight = height * 0.35
+        val mrzHeight = height * 0.20
         val mrzLeft = leftOffset
         val mrzTop = topOffset + height - mrzHeight
         val mrzWidth = width
@@ -276,19 +317,21 @@ class FotoapparatCamera constructor(
     }
 
     private fun calculateCutoutRectCardSize(bitmap: Bitmap, cropToMRZ: Boolean): Bitmap {
-        val documentFrameRatio = 1.42 // Passport's size (ISO/IEC 7810 ID-3) is 125mm × 88mm
+        // 여권 비율: 125mm × 88mm = 1.42:1
+        val documentFrameRatio = 1.42
         val width: Double
         val height: Double
     
         if (bitmap.height > bitmap.width) {
-            width = bitmap.width * 0.9 // Fill 90% of the width
+            width = bitmap.width * 0.9 // 화면 너비의 90%
             height = width / documentFrameRatio
         } else {
-            height = bitmap.height * 0.75 // Fill 75% of the height
+            height = bitmap.height * 0.75 // 화면 높이의 75%
             width = height * documentFrameRatio
         }
     
-        val mrzZoneOffset = if (cropToMRZ) height * 0.6 else 0.0
+        // MRZ는 여권 하단 44mm 영역 (전체 높이의 약 50%)
+        val mrzZoneOffset = if (cropToMRZ) height * 0.2  else 0.0
         val topOffset = ((bitmap.height - height) / 2 + mrzZoneOffset).coerceAtLeast(0.0)
         val leftOffset = ((bitmap.width - width) / 2).coerceAtLeast(0.0)
     
