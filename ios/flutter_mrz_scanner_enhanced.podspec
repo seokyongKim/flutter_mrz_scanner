@@ -15,7 +15,6 @@ A Flutter plugin for scanning MRZ (Machine Readable Zone) codes from identity do
   s.source_files = 'Classes/**/*'
   s.resources = ['Assets/TraineedDataBundle.bundle']
   s.dependency 'Flutter'
-  s.dependency 'SwiftyTesseract', '~> 3.1.3'
   s.platform = :ios, '12.0'
   
   # Flutter.framework does not contain a i386 slice.
